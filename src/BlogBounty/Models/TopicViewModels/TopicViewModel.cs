@@ -19,5 +19,7 @@ namespace BlogBounty.Models.TopicViewModels
         public DateTime CreatedAt { get; set; }
 
         public bool UserHasVoted { get; set; }
+
+        public int NumberOfUpvotes { get; set; }
     }
 }

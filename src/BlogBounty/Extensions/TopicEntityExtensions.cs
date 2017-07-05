@@ -13,6 +13,7 @@ namespace BlogBounty.Extensions
                 Description = t.Description,
                 Id = t.Id,
                 NumberOfSubscriptions = t.Subscriptions.Count,
+                NumberOfUpvotes = t.Upvotes.Count,
                 Title = t.Title,
                 Tags = t.Tags.Select(tt => tt.Tag.Tag).ToArray(),
                 Creator = t.User.UserName,

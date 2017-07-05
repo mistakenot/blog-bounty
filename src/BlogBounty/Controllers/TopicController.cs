@@ -4,7 +4,6 @@ using BlogBounty.Data;
 using BlogBounty.Models.TopicViewModels;
 using Microsoft.AspNetCore.Mvc;
 using BlogBounty.Extensions;
-using BlogBounty.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -106,6 +105,7 @@ namespace BlogBounty.Controllers
                 .Include(t => t.User)
                 .Include(t => t.Tags)
                 .ThenInclude(t => t.Tag)
+                .Include(t => t.Upvotes)
                 .SingleOrDefaultAsync(t => t.Id == id);
 
             if (topic == null)
@@ -129,7 +129,7 @@ namespace BlogBounty.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Upvote(int id)
+        public async Task<IActionResult> Vote(int id, bool userHasVoted)
         {
             if (!await _db.Topics.AnyAsync(t => t.Id == id))
             {
@@ -138,43 +138,41 @@ namespace BlogBounty.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
-            if (await _db.Upvotes.AnyAsync(u => u.TopicId == id && u.UserId == user.Id))
+            if (userHasVoted)
             {
-                return BadRequest("Already upvoted this topic.");
+                var upvote = await _db.Upvotes
+                    .FirstOrDefaultAsync(u => u.TopicId == id && u.UserId == user.Id);
+
+                if (upvote == null)
+                {
+                    ModelState.AddModelError(string.Empty, "You have not voted on this topic.");
+                }
+                else
+                {
+                    _db.Remove(upvote);
+                    await _db.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                if (await _db.Upvotes.AnyAsync(u => u.TopicId == id && u.UserId == user.Id))
+                {
+                    ModelState.AddModelError(string.Empty, "You have already voted.");
+                }
+                else
+                {
+                    var upvote = new UpvoteEntity()
+                    {
+                        TopicId = id,
+                        UserId = user.Id
+                    };
+
+                    _db.Add(upvote);
+                    await _db.SaveChangesAsync();
+                }
             }
 
-            var upvote = new UpvoteEntity()
-            {
-                TopicId = id,
-                UserId = user.Id
-            };
-
-            _db.Add(upvote);
-            await _db.SaveChangesAsync();
-
-            return Ok();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Downvote(int id)
-        {
-            if (!await _db.Topics.AnyAsync(t => t.Id == id))
-            {
-                return NotFound();
-            }
-
-            var user = await _userManager.GetUserAsync(User);
-            var upvote = await _db.Upvotes.FirstOrDefaultAsync(u => u.TopicId == id && u.UserId == user.Id);
-
-            if (upvote == null)
-            {
-                return BadRequest("Not upvoted this topic.");
-            }
-            
-            _db.Remove(upvote);
-            await _db.SaveChangesAsync();
-
-            return Ok();
+            return RedirectToAction("View", new {id});
         }
     }
 }
