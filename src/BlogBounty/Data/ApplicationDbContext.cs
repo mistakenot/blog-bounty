@@ -10,6 +10,7 @@ namespace BlogBounty.Data
         public DbSet<TopicTagEntity> TopicTags { get; set; }
         public DbSet<TagEntity> Tags { get; set; }
         public DbSet<SubmissionEntity> Submissions { get; set; }
+        public DbSet<UpvoteEntity> Upvotes { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

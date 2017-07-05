@@ -8,9 +8,10 @@ using BlogBounty.Data;
 namespace BlogBounty.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170705173911_relations")]
+    partial class relations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.1")
@@ -57,13 +58,17 @@ namespace BlogBounty.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<string>("Tags");
+
                     b.Property<string>("Title");
 
-                    b.Property<string>("UserId");
+                    b.Property<int>("UserId");
+
+                    b.Property<string>("UserId1");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Topics");
                 });
@@ -258,7 +263,7 @@ namespace BlogBounty.Migrations
                 {
                     b.HasOne("BlogBounty.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId1");
                 });
 
             modelBuilder.Entity("BlogBounty.Data.TopicTagEntity", b =>
@@ -269,7 +274,7 @@ namespace BlogBounty.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("BlogBounty.Data.TopicEntity", "Topic")
-                        .WithMany("Tags")
+                        .WithMany()
                         .HasForeignKey("TopicId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

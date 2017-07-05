@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.ApplicationInsights.Extensibility
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -35,6 +36,7 @@
                     <li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
                     <li><a asp-area="" asp-controller="Topic" asp-action="New">New</a></li>
+                    <li><a asp-area="" asp-controller="Submission" asp-action="Index">Submission</a></li>
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>

@@ -4,7 +4,9 @@ using BlogBounty.Data;
 using BlogBounty.Models.TopicViewModels;
 using Microsoft.AspNetCore.Mvc;
 using BlogBounty.Extensions;
+using BlogBounty.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BlogBounty.Controllers
@@ -13,10 +15,14 @@ namespace BlogBounty.Controllers
     public class TopicController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public TopicController(ApplicationDbContext db)
+        public TopicController(
+            ApplicationDbContext db,
+            UserManager<ApplicationUser> userManager)
         {
             _db = db;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -26,8 +32,44 @@ namespace BlogBounty.Controllers
         }
 
         [HttpPost]
-        public IActionResult New(NewTopicRequest request)
+        public async Task<IActionResult> New(NewTopicRequest request)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(request);
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            var requestedTags = request.Tags?.Split(' ') ?? new string[0];
+
+            var tags = await _db.Tags
+                .Where(t => requestedTags.Contains(t.Tag))
+                .ToListAsync();
+
+            var newTags = requestedTags
+                .Except(tags.Select(t => t.Tag))
+                .Select(t => new TagEntity {Tag = t});
+
+            tags = tags.Concat(newTags).ToList();
+
+            _db.Tags.AddRange(newTags);
+            await _db.SaveChangesAsync();
+
+            var model = new TopicEntity
+            {
+                Title = request.Title,
+                Description = request.Description,
+                UserId = user.Id
+            };
+
+            _db.Add(model);
+
+            var topicTags = tags
+                .Select(t => new TopicTagEntity {TagId = t.Id, TopicId = model.Id});
+
+            _db.AddRange(topicTags);
+            await _db.SaveChangesAsync();
+
             return View();
         }
 
@@ -54,6 +96,85 @@ namespace BlogBounty.Controllers
             };
 
             return Ok(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> View([FromRoute]int id)
+        {
+            var topic = await _db.Topics
+                .Include(t => t.Subscriptions)
+                .Include(t => t.User)
+                .Include(t => t.Tags)
+                .ThenInclude(t => t.Tag)
+                .SingleOrDefaultAsync(t => t.Id == id);
+
+            if (topic == null)
+            {
+                ModelState.AddModelError(string.Empty, "Not found.");
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            var userHasVoted = await _db.Upvotes
+                .AnyAsync(u => u.TopicId == id && u.UserId == user.Id);
+
+            var model = new ViewTopicViewModel
+            {
+                Topic = topic.ToViewModel(),
+                UserHasVoted = userHasVoted
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Upvote(int id)
+        {
+            if (!await _db.Topics.AnyAsync(t => t.Id == id))
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (await _db.Upvotes.AnyAsync(u => u.TopicId == id && u.UserId == user.Id))
+            {
+                return BadRequest("Already upvoted this topic.");
+            }
+
+            var upvote = new UpvoteEntity()
+            {
+                TopicId = id,
+                UserId = user.Id
+            };
+
+            _db.Add(upvote);
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Downvote(int id)
+        {
+            if (!await _db.Topics.AnyAsync(t => t.Id == id))
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            var upvote = await _db.Upvotes.FirstOrDefaultAsync(u => u.TopicId == id && u.UserId == user.Id);
+
+            if (upvote == null)
+            {
+                return BadRequest("Not upvoted this topic.");
+            }
+            
+            _db.Remove(upvote);
+            await _db.SaveChangesAsync();
+
+            return Ok();
         }
     }
 }

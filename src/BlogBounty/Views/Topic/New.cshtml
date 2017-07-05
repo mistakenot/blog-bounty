@@ -29,7 +29,7 @@
             <div class="form-group">
                 <label asp-for="Tags" class="col-md-2 control-label"></label>
                 <div class="col-md-10">
-                    <input asp-for="Tags" class="form-control" id="tags-input" data-role="tagsinput"/>
+                    <input asp-for="Tags" class="form-control"/>
                     <span asp-validation-for="Tags" class="text-danger"></span>
                 </div>
             </div>
@@ -44,26 +44,26 @@
 
 @section scripts {
 <script>
-    var citynames = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      prefetch: {
-        url: '/Tag/',
-        filter: function(list) {
-          return $.map(list, function(cityname) {
-            return { name: cityname }; });
-        }
-      }
-    });
-    citynames.initialize();
+    //var citynames = new Bloodhound({
+    //  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+    //  queryTokenizer: Bloodhound.tokenizers.whitespace,
+    //  prefetch: {
+    //    url: '/Tag/',
+    //    filter: function(list) {
+    //      return $.map(list, function(cityname) {
+    //        return { name: cityname }; });
+    //    }
+    //  }
+    //});
+    //citynames.initialize();
 
-    $('#tags-input').tagsinput({
-      typeaheadjs: {
-        name: 'citynames',
-        displayKey: 'name',
-        valueKey: 'name',
-        source: citynames.ttAdapter()
-      }
-    });
+    //$('#tags-input').tagsinput({
+    //  typeaheadjs: {
+    //    name: 'citynames',
+    //    displayKey: 'name',
+    //    valueKey: 'name',
+    //    source: citynames.ttAdapter()
+    //  }
+    //});
 </script>
 }

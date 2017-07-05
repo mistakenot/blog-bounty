@@ -1,4 +1,7 @@
-﻿using BlogBounty.Models;
+﻿using System;
+using System.Collections.Generic;
+using BlogBounty.Models;
+using BlogBounty.Models.TopicViewModels;
 
 namespace BlogBounty.Data
 {
@@ -10,9 +13,18 @@ namespace BlogBounty.Data
 
         public string Description { get; set; }
 
-        public string Tags { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public int UserId { get; set; }
+        public string UserId { get; set; }
         public ApplicationUser User { get; set; }
+
+        public List<SubmissionEntity> Subscriptions { get; set; }
+        public List<TopicTagEntity> Tags { get; set; }
+        public List<UpvoteEntity> Upvotes { get; set; }
+
+        public TopicEntity()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
     }
 }

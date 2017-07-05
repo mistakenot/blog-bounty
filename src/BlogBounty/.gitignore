@@ -268,3 +268,4 @@ __pycache__/
 # tools/
 
 wwwroot/lib
+appsettings.Development.json

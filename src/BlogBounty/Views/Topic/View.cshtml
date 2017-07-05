@@ -1,0 +1,32 @@
+﻿@model BlogBounty.Models.TopicViewModels.ViewTopicViewModel
+
+@{
+    ViewBag.Title = "View topic";
+    Layout = "_Layout";
+}
+
+<h2>View topic</h2>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>@Model.Topic.Title</h4>
+                @foreach (var tag in Model.Topic.Tags)
+                {
+                    <span class="label label-info">@tag</span>
+                }
+                <button class="btn btn-primary" type="button">
+                    @Model.UserHasVoted ? Downvote : Upvote
+                    <span class="badge">
+                        <span class="glyphicon glyphicon-triangle-top"></span>
+                        @Model.Topic.NumberOfSubscriptions
+                    </span>
+                </button>
+            </div>
+            <div class="panel-body">
+                <p>@Model.Topic.Description</p>
+            </div>
+        </div>
+    </div>
+</div>
