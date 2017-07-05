@@ -1,0 +1,69 @@
+﻿@model BlogBounty.Models.TopicViewModels.NewTopicRequest
+
+@{
+    ViewBag.Title = "New topic suggestion";
+    Layout = "_Layout";
+}
+
+<h2>New topic suggestion</h2>
+<div class="row">
+    <div class="col-md-8">
+        <form asp-controller="Topic" asp-action="New" method="post" class="form-horizontal">
+            <h4>Create a new Blog Topic suggestion</h4>
+            <hr />
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="Description" class="form-control" />
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tags" class="col-md-2 control-label"></label>
+                <div class="col-md-10">
+                    <input asp-for="Tags" class="form-control" id="tags-input" data-role="tagsinput"/>
+                    <span asp-validation-for="Tags" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button type="submit" class="btn btn-default">Create</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts {
+<script>
+    var citynames = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      prefetch: {
+        url: '/Tag/',
+        filter: function(list) {
+          return $.map(list, function(cityname) {
+            return { name: cityname }; });
+        }
+      }
+    });
+    citynames.initialize();
+
+    $('#tags-input').tagsinput({
+      typeaheadjs: {
+        name: 'citynames',
+        displayKey: 'name',
+        valueKey: 'name',
+        source: citynames.ttAdapter()
+      }
+    });
+</script>
+}
