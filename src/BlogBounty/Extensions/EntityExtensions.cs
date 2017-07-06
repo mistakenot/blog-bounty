@@ -4,7 +4,7 @@ using BlogBounty.Models.TopicViewModels;
 
 namespace BlogBounty.Extensions
 {
-    public static class TopicEntityExtensions
+    public static class EntityExtensions
     {
         public static TopicViewModel ToViewModel(this TopicEntity t)
         {
@@ -18,6 +18,16 @@ namespace BlogBounty.Extensions
                 Tags = t.Tags.Select(tt => tt.Tag.Label).ToArray(),
                 Creator = t.User.UserName,
                 CreatedAt = t.CreatedAt
+            };
+        }
+
+        public static CommentViewModel ToViewModel(this CommentEntitiy c)
+        {
+            return new CommentViewModel
+            {
+                Id = c.Id,
+                Body = c.Body,
+                UserName = c.User.UserName
             };
         }
     }

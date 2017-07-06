@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BlogBounty.Data;
 using BlogBounty.Models.TopicViewModels;
@@ -120,10 +121,15 @@ namespace BlogBounty.Controllers
             var userHasVoted = await _db.Upvotes
                 .AnyAsync(u => u.TopicId == id && u.UserId == user.Id);
 
+            var comments = await _db.Comments
+                .Where(c => c.TopicId == topic.Id)
+                .ToListAsync();
+
             var model = new ViewTopicViewModel
             {
                 Topic = topic.ToViewModel(),
-                UserHasVoted = userHasVoted
+                UserHasVoted = userHasVoted,
+                Comments = comments.Select(c => c.ToViewModel())
             };
 
             return View(model);
@@ -174,6 +180,38 @@ namespace BlogBounty.Controllers
             }
 
             return RedirectToAction("View", new {id});
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Comment(
+            [FromRoute]int id, 
+            [FromBody]NewCommentViewModel model)
+        {
+            var topic = await _db.Topics.SingleOrDefaultAsync(t => t.Id == id);
+
+            if (topic == null)
+            {
+                ModelState.AddModelError(string.Empty, "Not found.");
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+
+            var comment = new CommentEntitiy()
+            {
+                Body = model.Body,
+                TopicId = topic.Id,
+                CreatedAt = DateTime.UtcNow,
+                UserId = user.Id
+            };
+
+            if (model.ReplyingTo.HasValue)
+            {
+                var replyingComment = await _db.Comments
+                    .SingleOrDefaultAsync(c => c.Id == model.ReplyingTo.Value);
+
+                comment.ParentId = replyingComment.Id;
+            }
+
         }
     }
 }
