@@ -183,20 +183,20 @@ namespace BlogBounty.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Comment(
-            [FromRoute]int id, 
-            [FromBody]NewCommentViewModel model)
+        public async Task<IActionResult> Comment(NewCommentViewModel model)
         {
+            var id = model.TopicId;
             var topic = await _db.Topics.SingleOrDefaultAsync(t => t.Id == id);
 
             if (topic == null)
             {
                 ModelState.AddModelError(string.Empty, "Not found.");
+                return RedirectToAction("View", new {id});
             }
 
             var user = await _userManager.GetUserAsync(User);
 
-            var comment = new CommentEntitiy()
+            var comment = new CommentEntity()
             {
                 Body = model.Body,
                 TopicId = topic.Id,
@@ -209,9 +209,19 @@ namespace BlogBounty.Controllers
                 var replyingComment = await _db.Comments
                     .SingleOrDefaultAsync(c => c.Id == model.ReplyingTo.Value);
 
+                if (replyingComment == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Comment not found.");
+                    return RedirectToAction("View", new { id });
+                }
+
                 comment.ParentId = replyingComment.Id;
             }
 
+            _db.Add(comment);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction("View", new {id});
         }
     }
 }

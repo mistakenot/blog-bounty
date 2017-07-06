@@ -2,7 +2,7 @@
 
 namespace BlogBounty.Data
 {
-    public class CommentEntitiy
+    public class CommentEntity
     {
         public int Id { get; set; }
 
@@ -11,7 +11,7 @@ namespace BlogBounty.Data
         public DateTime CreatedAt { get; set; }
 
         public int? ParentId { get; set; }
-        public CommentEntitiy Parent { get; set; }
+        public CommentEntity Parent { get; set; }
 
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }

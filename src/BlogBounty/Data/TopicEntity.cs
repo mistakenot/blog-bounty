@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using BlogBounty.Models;
-using BlogBounty.Models.TopicViewModels;
 
 namespace BlogBounty.Data
 {
@@ -21,6 +19,7 @@ namespace BlogBounty.Data
         public List<SubmissionEntity> Subscriptions { get; set; }
         public List<TopicTagEntity> Tags { get; set; }
         public List<UpvoteEntity> Upvotes { get; set; }
+        public List<CommentEntity> Comments { get; set; }
 
         public TopicEntity()
         {

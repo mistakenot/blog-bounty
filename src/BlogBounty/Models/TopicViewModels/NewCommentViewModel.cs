@@ -8,6 +8,8 @@ namespace BlogBounty.Models.TopicViewModels
         [MinLength(1)]
         public string Body { get; set; }
 
+        public int TopicId { get; set; }
+
         public int? ReplyingTo { get; set; }
     }
 }

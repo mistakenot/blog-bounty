@@ -1,4 +1,5 @@
-﻿@model BlogBounty.Models.TopicViewModels.ViewTopicViewModel
+﻿@using BlogBounty.Models.TopicViewModels
+@model ViewTopicViewModel
 
 @{
     ViewBag.Title = "View topic";
@@ -43,3 +44,10 @@
         </div>
     </div>
 </div>
+
+@Html.Partial("_NewComment", new NewCommentViewModel() { TopicId = Model.Topic.Id })
+
+@foreach (var comment in Model.Comments)
+{
+    Html.RenderPartial("_Comment", comment);
+}

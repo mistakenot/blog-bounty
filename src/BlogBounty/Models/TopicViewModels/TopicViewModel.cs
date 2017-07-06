@@ -12,7 +12,7 @@ namespace BlogBounty.Models.TopicViewModels
 
         public int NumberOfSubscriptions { get; set; }
 
-        public string[] Tags { get; set; }
+        public string[] Tags { get; set; } = new string[0];
 
         public string Creator { get; set; }
         

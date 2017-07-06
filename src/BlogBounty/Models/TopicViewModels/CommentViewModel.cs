@@ -1,4 +1,6 @@
-﻿namespace BlogBounty.Models.TopicViewModels
+﻿using System.Collections.Generic;
+
+namespace BlogBounty.Models.TopicViewModels
 {
     public class CommentViewModel
     {
@@ -7,5 +9,9 @@
         public string UserName { get; set; }
 
         public string Body { get; set; }
+
+        public int TopicId { get; set; }
+
+        public List<CommentViewModel> Replies { get; set; } = new List<CommentViewModel>();
     }
 }

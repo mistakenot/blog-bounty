@@ -1,0 +1,18 @@
+@using BlogBounty.Models.TopicViewModels
+@model CommentViewModel
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                @Model.Body
+                @foreach(var reply in Model.Replies)
+                {
+                    Html.RenderPartial("_Comment", reply);
+                }
+
+                @Html.Partial("_NewComment", new NewCommentViewModel() { TopicId = Model.TopicId, ReplyingTo = Model.Id })
+            </div>
+        </div>
+    </div>
+</div>

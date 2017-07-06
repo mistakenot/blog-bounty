@@ -8,6 +8,6 @@ namespace BlogBounty.Models.TopicViewModels
 
         public bool UserHasVoted { get; set; }
 
-        public IEnumerable<CommentViewModel> Comments { get; set; }
+        public IEnumerable<CommentViewModel> Comments { get; set; } = new List<CommentViewModel>();
     }
 }

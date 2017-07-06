@@ -7,5 +7,6 @@ namespace BlogBounty.Data
     public class ApplicationUser : IdentityUser
     {
         public List<UpvoteEntity> Upvotes { get; set; }
+        public List<CommentEntity> Comments { get; set; }
     }
 }
