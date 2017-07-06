@@ -2,7 +2,6 @@
 using BlogBounty.Data;
 using BlogBounty.Models.SubmissionViewModels;
 using Microsoft.AspNetCore.Mvc;
-using BlogBounty.Models;
 using BlogBounty.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

@@ -1,0 +1,28 @@
+﻿@model System.Collections.Generic.IEnumerable<BlogBounty.Models.TopicViewModels.TopicViewModel>
+
+<div class="row">
+    <div class="col-sm12">
+        <div class="list-group">
+            @foreach (var topic in Model)
+            {
+                <a class="list-group-item"
+                   asp-controller="Topic"
+                   asp-action="View"
+                   asp-route-id="@topic.Id">
+                    @topic.Title
+                    @foreach (var tag in topic.Tags)
+                    {
+                        <span class="label label-info">
+
+                            @tag
+                        </span>
+                    }
+                    <span class="badge">
+                        <span class="glyphicon glyphicon-triangle-top"></span>
+                        @topic.NumberOfSubscriptions
+                    </span>
+                </a>
+            }
+        </div>
+    </div>
+</div>

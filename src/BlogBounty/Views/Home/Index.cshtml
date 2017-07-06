@@ -1,4 +1,5 @@
-﻿@model BlogBounty.Models.HomeViewModels.HomeIndexViewModel
+﻿@using BlogBounty.ViewComponents
+@model BlogBounty.Models.HomeViewModels.HomeIndexViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -7,26 +8,6 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <div class="container">
-            <div class="list-group">
-            @foreach (var topic in Model.Topics)
-            {
-                <a class="list-group-item"
-                   asp-controller="Topic"
-                   asp-action="View"
-                   asp-route-id="@topic.Id">
-                    @topic.Title
-                @foreach (var tag in topic.Tags)
-                {
-                    <span class="label label-info">@tag</span>
-                }
-                    <span class="badge">
-                        <span class="glyphicon glyphicon-triangle-top"></span>
-                        @topic.NumberOfSubscriptions
-                    </span>
-                </a>
-            }
-            </div>
-        </div>
+        @(await Component.InvokeAsync<TopicSearchViewComponent>())
     </div>
 </div>

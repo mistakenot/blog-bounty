@@ -29,8 +29,8 @@ namespace BlogBounty.Controllers
         public async Task<IActionResult> Suggestions(string term)
         {
             var tags = await _db.Tags
-                .Where(t => t.Tag.Matches(term))
-                .Select(t => t.Tag)
+                .Where(t => t.Label.Matches(term))
+                .Select(t => t.Label)
                 .ToListAsync();
 
             return Ok(tags);

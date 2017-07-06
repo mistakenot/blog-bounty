@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
 
-        public string Tag { get; set; }
+        public string Label { get; set; }
     }
 }

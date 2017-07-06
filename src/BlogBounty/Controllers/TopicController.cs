@@ -42,16 +42,15 @@ namespace BlogBounty.Controllers
             var requestedTags = request.Tags?.Split(' ') ?? new string[0];
 
             var tags = await _db.Tags
-                .Where(t => requestedTags.Contains(t.Tag))
+                .Where(t => requestedTags.Contains(t.Label))
                 .ToListAsync();
 
             var newTags = requestedTags
-                .Except(tags.Select(t => t.Tag))
-                .Select(t => new TagEntity {Tag = t});
+                .Except(tags.Select(t => t.Label))
+                .Select(t => new TagEntity {Label = t})
+                .ToList();
 
-            tags = tags.Concat(newTags).ToList();
-
-            _db.Tags.AddRange(newTags);
+            _db.AddRange(newTags);
             await _db.SaveChangesAsync();
 
             var model = new TopicEntity
@@ -62,14 +61,16 @@ namespace BlogBounty.Controllers
             };
 
             _db.Add(model);
+            await _db.SaveChangesAsync();
 
             var topicTags = tags
+                .Concat(newTags)
                 .Select(t => new TopicTagEntity {TagId = t.Id, TopicId = model.Id});
 
             _db.AddRange(topicTags);
             await _db.SaveChangesAsync();
 
-            return View();
+            return RedirectToAction("View", new {id = model.Id});
         }
 
         [HttpGet]

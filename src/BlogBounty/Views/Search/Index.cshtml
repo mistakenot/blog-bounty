@@ -1,0 +1,15 @@
+﻿@using BlogBounty.ViewComponents
+@model BlogBounty.Models.SearchViewModels.SearchRequestModel
+
+@{
+    ViewBag.Title = "Search";
+}
+<h2>Overview</h2>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            @(await Component.InvokeAsync<TopicSearchViewComponent>(Model))
+        </div>
+    </div>
+</div>
