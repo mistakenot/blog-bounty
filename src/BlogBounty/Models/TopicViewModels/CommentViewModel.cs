@@ -13,5 +13,7 @@ namespace BlogBounty.Models.TopicViewModels
         public int TopicId { get; set; }
 
         public List<CommentViewModel> Replies { get; set; } = new List<CommentViewModel>();
+
+        public int? ParentId { get; set; }
     }
 }

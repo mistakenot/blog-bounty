@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using BlogBounty.Data;
@@ -31,7 +30,8 @@ namespace BlogBounty.Extensions
                 Id = c.Id,
                 Body = c.Body,
                 UserName = c.User.UserName,
-                TopicId = c.TopicId
+                TopicId = c.TopicId,
+                ParentId = c.ParentId
             };
         }
 
@@ -46,15 +46,16 @@ namespace BlogBounty.Extensions
 
             var roots = commentEntitiys
                 .Where(c => !c.ParentId.HasValue)
-                .Select(c => c.ToViewModel());
+                .Select(c => c.ToViewModel())
+                .ToArray();
 
             var children = new Stack<CommentViewModel>(
                 commentEntitiys
                     .Where(c => c.ParentId.HasValue)
                     .Select(c => c.ToViewModel()));
 
-            var map = commentEntitiys
-                .Select(c => c.ToViewModel())
+            var map = roots
+                .Concat(children)
                 .ToDictionary(c => c.Id);
 
             if (!roots.Any())
@@ -66,9 +67,9 @@ namespace BlogBounty.Extensions
             {
                 var next = children.Pop();
 
-                if (map.ContainsKey(next.Id))
+                if (map.ContainsKey(next.ParentId.Value))
                 {
-                    map[next.Id].Replies.Add(next);
+                    map[next.ParentId.Value].Replies.Add(next);
                 }
                 else
                 {

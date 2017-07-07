@@ -129,7 +129,7 @@ namespace BlogBounty.Controllers
             {
                 Topic = topic.ToViewModel(),
                 UserHasVoted = userHasVoted,
-                Comments = comments.Select(c => c.ToViewModel())
+                Comments = comments.ToViewModel()
             };
 
             return View(model);
