@@ -31,7 +31,8 @@ namespace BlogBounty.Extensions
                 Body = c.Body,
                 UserName = c.User.UserName,
                 TopicId = c.TopicId,
-                ParentId = c.ParentId
+                ParentId = c.ParentId,
+                CreatedAt = c.CreatedAt
             };
         }
 
@@ -40,6 +41,11 @@ namespace BlogBounty.Extensions
             if (comments == null)
             {
                 throw new ArgumentNullException(nameof(comments));
+            }
+
+            if (!comments.Any())
+            {
+                return Enumerable.Empty<CommentViewModel>();
             }
 
             var commentEntitiys = comments.ToArray();

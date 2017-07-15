@@ -13,3 +13,17 @@
         </div>
     </div>
 </div>
+
+@section scripts{
+    <script>alert();</script>
+    <script>
+        $("Filter").typeahead({
+            onSelect: function (item) {
+                alert();
+            },
+            ajax: {
+                url: "Search"
+            }
+        })
+    </script>
+}

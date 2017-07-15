@@ -8,6 +8,7 @@ using BlogBounty.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace BlogBounty.Controllers
 {
@@ -100,6 +101,7 @@ namespace BlogBounty.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> View([FromRoute]int id)
         {
             var topic = await _db.Topics
@@ -116,20 +118,37 @@ namespace BlogBounty.Controllers
                 return NotFound();
             }
 
-            var user = await _userManager.GetUserAsync(User);
+            bool? userHasVoted = null;
 
-            var userHasVoted = await _db.Upvotes
-                .AnyAsync(u => u.TopicId == id && u.UserId == user.Id);
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+
+                userHasVoted = await _db.Upvotes
+                    .AnyAsync(u => u.TopicId == id && u.UserId == user.Id);
+            }
 
             var comments = await _db.Comments
                 .Where(c => c.TopicId == topic.Id)
                 .ToListAsync();
 
+            IEnumerable<CommentViewModel> commentViewModels;
+
+            try
+            {
+                commentViewModels = comments?.ToViewModel()
+                    ?? Enumerable.Empty<CommentViewModel>();
+            }
+            catch (ArgumentException)
+            {
+                commentViewModels = Enumerable.Empty<CommentViewModel>();
+            }
+
             var model = new ViewTopicViewModel
             {
                 Topic = topic.ToViewModel(),
                 UserHasVoted = userHasVoted,
-                Comments = comments.ToViewModel()
+                Comments = commentViewModels
             };
 
             return View(model);

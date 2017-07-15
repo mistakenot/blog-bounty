@@ -1,5 +1,8 @@
 @using BlogBounty.Models.TopicViewModels
 @model CommentViewModel
+@{ 
+    var replyBoxId = "reply-box-" + Model.Id;
+}
 
 <div class="row">
     <div class="col-sm-12">
@@ -11,8 +14,33 @@
                 {
                     Html.RenderPartial("_Comment", reply);
                 }
-
-                @Html.Partial("_NewComment", new NewCommentViewModel() { TopicId = Model.TopicId, ReplyingTo = Model.Id })
+                <div class="row">
+                    <div class="col-sm-12">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                        <span>
+                            <button class="btn btn-sm btn-info"
+                                    type="button"
+                                    data-toggle="collapse"
+                                    data-target="#@replyBoxId"
+                                    aria-expanded="false"
+                                    aria-controls="collapseExample">
+                                <small>Reply</small>
+                            </button>
+                        </span>
+                        }
+                        <span class="label label-default">
+                            <em>@Model.UserName @@ @Model.CreatedAt.ToString()</em>
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="collapse" id="@replyBoxId">
+                            @Html.Partial("_NewComment", new NewCommentViewModel() { TopicId = Model.TopicId, ReplyingTo = Model.Id })
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

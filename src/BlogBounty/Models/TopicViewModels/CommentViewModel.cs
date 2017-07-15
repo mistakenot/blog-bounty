@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace BlogBounty.Models.TopicViewModels
 {
@@ -15,5 +16,7 @@ namespace BlogBounty.Models.TopicViewModels
         public List<CommentViewModel> Replies { get; set; } = new List<CommentViewModel>();
 
         public int? ParentId { get; set; }
+
+        public DateTime CreatedAt { get; set; }
     }
 }

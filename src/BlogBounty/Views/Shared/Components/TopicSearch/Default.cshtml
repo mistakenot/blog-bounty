@@ -1,7 +1,21 @@
 ﻿@model System.Collections.Generic.IEnumerable<BlogBounty.Models.TopicViewModels.TopicViewModel>
 
 <div class="row">
-    <div class="col-sm12">
+    <div class="col-sm-12">
+        <form asp-controller="Home" 
+              asp-action="Index" 
+              method="post" 
+              class="form-horizontal">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <input class="form-control" type="text" placeholder="Search..." id="Filter" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm1-2">
         <div class="list-group">
             @foreach (var topic in Model)
             {

@@ -6,7 +6,7 @@ namespace BlogBounty.Models.TopicViewModels
     {
         public TopicViewModel Topic { get; set; }
 
-        public bool UserHasVoted { get; set; }
+        public bool? UserHasVoted { get; set; }
 
         public IEnumerable<CommentViewModel> Comments { get; set; } = new List<CommentViewModel>();
     }
