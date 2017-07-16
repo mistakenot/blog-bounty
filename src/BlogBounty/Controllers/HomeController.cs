@@ -1,6 +1,11 @@
 ﻿using System.Threading.Tasks;
 using BlogBounty.Data;
 using Microsoft.AspNetCore.Mvc;
+using BlogBounty.Models.SearchViewModels;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using BlogBounty.Extensions;
+using BlogBounty.Models.HomeViewModels;
 
 namespace BlogBounty.Controllers
 {
@@ -13,14 +18,38 @@ namespace BlogBounty.Controllers
             _db = db;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Search");
-            }
+            return await Index(new SearchRequestModel());
+        }
 
-            return View();
+        [HttpPost]
+        public async Task<IActionResult> Index(SearchRequestModel model)
+        {
+            var tags = model.Tag?.Split(' ');
+            var skip = 0;
+            var take = 10;
+
+            var topics = await _db
+                .TopicsWithRelations()
+                .Where(t =>
+                    tags == null || t.Tags.Any(tag => tags.Contains(tag.Tag.Label)))
+                .OrderByDescending(t => t.CreatedAt)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+
+            var response = new HomeIndexViewModel
+            {
+                SearchModel = new SearchViewModel
+                {
+                    Request = model,
+                    Topics = topics.Select(t => t.ToViewModel())
+                }
+            };
+
+            return View(response);
         }
 
         public IActionResult About()

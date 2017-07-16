@@ -1,9 +1,14 @@
-﻿namespace BlogBounty.Models.HomeViewModels
+﻿using BlogBounty.Models.SearchViewModels;
+
+namespace BlogBounty.Models.HomeViewModels
 {
     public class HomeIndexViewModel
     {
-        public int Page { get; set; }
+        public SearchViewModel SearchModel { get; set; }
 
-        public int MaxPages { get; set; }
+        public HomeIndexViewModel()
+        {
+            SearchModel = new SearchViewModel();
+        }
     }
 }

@@ -15,7 +15,7 @@
             <div class="form-group">
                 <label asp-for="Title" class="col-md-2 control-label"></label>
                 <div class="col-md-10">
-                    <input asp-for="Title" class="form-control" />
+                    <input asp-for="Title" class="form-control" id="Filter"/>
                     <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
             </div>
@@ -28,9 +28,24 @@
             </div>
             <div class="form-group">
                 <label asp-for="Tags" class="col-md-2 control-label"></label>
+                <input asp-for="Tags" type="hidden" data-bind="value: allTags"/>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button" data-bind="click: addTag">+</button>
+                        </span>
+                        <input type="text" class="form-control" data-bind="value: currentTag" placeholder="Choose at least 1 tag." id="CurrentTag"/>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
                 <div class="col-md-10">
-                    <input asp-for="Tags" class="form-control"/>
-                    <span asp-validation-for="Tags" class="text-danger"></span>
+                    <div data-bind="foreach: tags">
+                        <span class="label label-default">
+                            <a href="#" data-bind="click: remove" style="color: white">x</a>
+                            <span data-bind="text: value"></span>
+                        </span>
+                    </div>
                 </div>
             </div>
             <div class="form-group">
@@ -44,26 +59,88 @@
 
 @section scripts {
 <script>
-    //var citynames = new Bloodhound({
-    //  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-    //  queryTokenizer: Bloodhound.tokenizers.whitespace,
-    //  prefetch: {
-    //    url: '/Tag/',
-    //    filter: function(list) {
-    //      return $.map(list, function(cityname) {
-    //        return { name: cityname }; });
-    //    }
-    //  }
-    //});
-    //citynames.initialize();
+    $("#Filter").typeahead({
+        onSelect: function (item) {
+            window.location.href = item.value;
+        },
+        ajax: {
+            url: "/Search/Suggestion",
+            timeout: 250,
+            displayField: "title",
+            valueField: "url",
+            triggerLength: 1,
+            method: "get",
+            loadingClass: "loading-circle",
+            preDispatch: function (query) {
+                return {
+                    filter: query
+                }
+            }
+        }
+    })
+    
+    function TagViewModel(value, onRemove) {
+        var self = this;
+        this.value = value;
+        this.onRemove = onRemove;
 
-    //$('#tags-input').tagsinput({
-    //  typeaheadjs: {
-    //    name: 'citynames',
-    //    displayKey: 'name',
-    //    valueKey: 'name',
-    //    source: citynames.ttAdapter()
-    //  }
-    //});
+        this.remove = function () {
+            self.onRemove(value);
+        }
+    }
+
+    function TagsViewModel() {
+        var self = this;
+        var newTag = (value) => new TagViewModel(value, v => self.removeTag(v));
+
+        this.tags = ko.observableArray([newTag("test")]);
+        this.currentTag = ko.observable("");
+        this.add = function (value) {
+            var current = self.tags();
+            var newVals = current.concat(newTag(value));
+            var unique = _.uniqBy(newVals, v => v.value);
+            self.tags(unique);
+            self.currentTag("");
+        }
+        this.addTag = function () {
+            var value = self.currentTag();
+            self.add(value);
+        }
+        this.removeTag = function (tag) {
+            var next = _.filter(self.tags(), v => v.value != tag);
+            self.tags(next);
+        }
+        this.allTags = ko.computed(() => {
+            var tags = self.tags().map(t => t.value);
+            return _.join(tags, " ");
+        })
+    }
+
+    var model = new TagsViewModel();
+
+    $("#CurrentTag").typeahead({
+        onSelect: function (item) {
+            model.add(item.text);
+        },
+        ajax: {
+            url: "/Search/Tags",
+            timeout: 250,
+            displayField: "value",
+            triggerLength: 1,
+            method: "get",
+            loadingClass: "loading-circle",
+            preDispatch: function (query) {
+                return {
+                    filter: query
+                }
+            },
+            preProcessing: function(item) {
+                console.log(item);
+            }
+        }
+
+    })
+
+    ko.applyBindings(model);
 </script>
 }

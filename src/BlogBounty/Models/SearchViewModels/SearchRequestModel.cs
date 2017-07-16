@@ -6,6 +6,10 @@
 
         public string Filter { get; set; }
 
-        public static readonly SearchRequestModel Default = new SearchRequestModel() {Tag = null, Filter = null};
+        public SearchRequestModel()
+        {
+            Tag = null;
+            Filter = null;
+        }
     }
 }
