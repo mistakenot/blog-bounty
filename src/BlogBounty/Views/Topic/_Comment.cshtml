@@ -9,7 +9,7 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <p>@Model.Body</p>
-                </br>
+                <br/>
                 @foreach(var reply in Model.Replies)
                 {
                     Html.RenderPartial("_Comment", reply);

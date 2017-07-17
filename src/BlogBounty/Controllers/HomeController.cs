@@ -35,6 +35,9 @@ namespace BlogBounty.Controllers
                 .TopicsWithRelations()
                 .Where(t =>
                     tags == null || t.Tags.Any(tag => tags.Contains(tag.Tag.Label)))
+                .Where(t => 
+                    string.IsNullOrEmpty(model.Filter) 
+                    || (t.Title.Contains(model.Filter) || t.Description.Contains(model.Filter) || t.Tags.Any(tag => tag.Tag.Label.Contains(model.Filter))))
                 .OrderByDescending(t => t.CreatedAt)
                 .Skip(skip)
                 .Take(take)
@@ -46,7 +49,8 @@ namespace BlogBounty.Controllers
                 {
                     Request = model,
                     Topics = topics.Select(t => t.ToViewModel())
-                }
+                },
+                CanReset = tags != null || model.Filter != null
             };
 
             return View(response);

@@ -4,62 +4,62 @@
 @{
     ViewBag.Title = "View topic";
     Layout = "_Layout";
+    var canVote = User.Identity.IsAuthenticated;
+    var isAuthed = User.Identity.IsAuthenticated && Model.UserHasVoted.HasValue;
 }
-
-<h2>View topic</h2>
 
 <div class="row">
     <div class="col-sm-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <div class="row">
-                    <form asp-controller="Topic"
-                          asp-action="Vote"
-                          asp-route-id="@Model.Topic.Id"
-                          method="post"
-                          class="form-horizontal">
-                        <div class="col-sm-12">
-                            @Model.Topic.Title
-                            @foreach (var tag in Model.Topic.Tags)
-                            {
-                                <span class="label label-info">@tag</span>
-                            }
-                            <span class="pull-right">
-                                <button class="btn btn-primary" type="submit" disabled="@(User.Identity.IsAuthenticated ? "disabled" : "")">
-                                @if (User.Identity.IsAuthenticated)
-                                {
-                                    @(Model.UserHasVoted.Value ? "Downvote" : "Upvote")
-                                }
-                                else
-                                {
-                                    <small>Login to vote</small>
-                                }
-                                    <span class="badge">
-                                        <span class="glyphicon glyphicon-triangle-top"></span>
-                                        @Model.Topic.NumberOfUpvotes
-                                    </span>
-                                </button>
-                            </span>
-                            <input type="hidden" name="userHasVoted" value="@(Model.UserHasVoted ?? false)" />
-                        </div>
-                    </form>
-                </div>
+                <form asp-controller="Topic"
+                        asp-action="Vote"
+                        asp-route-id="@Model.Topic.Id"
+                        method="post"
+                        class="form-inline">
+                    <button class="btn btn-primary" type="submit" @(!canVote ? "disabled" : "")>
+                        @if (isAuthed)
+                        {
+                            @(Model.UserHasVoted.Value ? "Downvote" : "Upvote")
+                        }
+                        else
+                        {
+                            <small>Login to vote</small>
+                        }
+                        <span class="badge">
+                            <span class="glyphicon glyphicon-triangle-top"></span>
+                            @Model.Topic.NumberOfUpvotes
+                        </span>
+                    </button>
+                    <input type="hidden" name="userHasVoted" value="@(Model.UserHasVoted ?? false)" />
+                    <div class="form-group">
+                        @foreach (var tag in Model.Topic.Tags)
+                        {
+                            <span class="label label-info">@tag</span>
+                        }
+                    </div>
+                </form>
             </div>
             <div class="panel-body">
+                <h2>
+                    @Model.Topic.Title
+                </h2>
                 <p>@Model.Topic.Description</p>
             </div>
         </div>
     </div>
 </div>
 
-<h4>Comments</h4>
+<div class="well">
+    <h4>Comments</h4>
 
-@if (User.Identity.IsAuthenticated)
-{
-    @Html.Partial("_NewComment", new NewCommentViewModel() { TopicId = Model.Topic.Id })
-}
+    @if (User.Identity.IsAuthenticated)
+    {
+        @Html.Partial("_NewComment", new NewCommentViewModel() { TopicId = Model.Topic.Id })
+    }
 
-@foreach (var comment in Model.Comments)
-{
-    Html.RenderPartial("_Comment", comment);
-}
+    @foreach (var comment in Model.Comments)
+    {
+        Html.RenderPartial("_Comment", comment);
+    }
+</div>
