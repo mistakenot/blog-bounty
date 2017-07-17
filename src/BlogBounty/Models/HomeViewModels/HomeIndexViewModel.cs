@@ -8,10 +8,16 @@ namespace BlogBounty.Models.HomeViewModels
 
         public bool CanReset { get; set; }
 
+        public int? NextPage { get; set; }
+
+        public int? PrevPage { get; set; }
+
         public HomeIndexViewModel()
         {
             SearchModel = new SearchViewModel();
             CanReset = false;
+            NextPage = null;
+            PrevPage = null;
         }
     }
 }

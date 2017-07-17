@@ -28,10 +28,10 @@ namespace BlogBounty.Controllers
         public async Task<IActionResult> Index([FromQuery]SearchRequestModel model)
         {
             var tags = model.Tag?.Split(' ');
-            var skip = 0;
             var take = 10;
+            var skip = take * model.Page;
 
-            var topics = await _db
+            var query = _db
                 .TopicsWithRelations()
                 .Where(t =>
                     tags == null || t.Tags.Any(tag => tags.Contains(tag.Tag.Label)))
@@ -39,7 +39,13 @@ namespace BlogBounty.Controllers
                     string.IsNullOrEmpty(model.Filter)
                     || (t.Title.Contains(model.Filter) || (t.Description ?? string.Empty).Contains(model.Filter) || t.Tags.Any(tag => tag.Tag.Label.Contains(model.Filter))))
                 .OrderByDescending(t => t.CreatedAt)
-                .Skip(skip)
+                .Skip(skip);
+
+            var anyMore = await query
+                .Skip(take)
+                .AnyAsync();
+
+            var topics = await query
                 .Take(take)
                 .ToListAsync();
 
@@ -50,7 +56,9 @@ namespace BlogBounty.Controllers
                     Request = model,
                     Topics = topics.Select(t => t.ToViewModel())
                 },
-                CanReset = tags != null || model.Filter != null
+                CanReset = tags != null || model.Filter != null,
+                PrevPage = model.Page > 0 ? (int?)model.Page - 1 : null,
+                NextPage = anyMore ? (int?)model.Page + 1 : null
             };
 
             return View(response);

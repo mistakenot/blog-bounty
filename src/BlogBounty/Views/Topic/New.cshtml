@@ -29,13 +29,12 @@
             <div class="form-group">
                 <label asp-for="Tags" class="col-md-2 control-label"></label>
                 <input asp-for="Tags" type="hidden" data-bind="value: allTags"/>
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="button" data-bind="click: addTag">+</button>
-                        </span>
-                        <input type="text" class="form-control" data-bind="value: currentTag" placeholder="Choose at least 1 tag." id="CurrentTag"/>
-                    </div>
+                <div class="col-md-10">
+                    <input type="text" 
+                           class="form-control" 
+                           data-bind="value: currentTag, events:{keyup: onKeyUp}" 
+                           placeholder="Choose or create at least 1 tag." 
+                           id="CurrentTag" />
                 </div>
             </div>
             <div class="form-group">
@@ -93,7 +92,7 @@
         var self = this;
         var newTag = (value) => new TagViewModel(value, v => self.removeTag(v));
 
-        this.tags = ko.observableArray([newTag("test")]);
+        this.tags = ko.observableArray([]);
         this.currentTag = ko.observable("");
         this.add = function (value) {
             var current = self.tags();

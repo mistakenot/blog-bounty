@@ -6,12 +6,13 @@
 
         public string Filter { get; set; }
 
-        public int? Page { get; set; }
+        public int Page { get; set; }
 
         public SearchRequestModel()
         {
             Tag = null;
             Filter = null;
+            Page = 0;
         }
     }
 }
