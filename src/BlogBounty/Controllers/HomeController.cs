@@ -18,14 +18,14 @@ namespace BlogBounty.Controllers
             _db = db;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        [HttpPost]
+        public Task<IActionResult> Index(string filter)
         {
-            return await Index(new SearchRequestModel());
+            return Index(new SearchRequestModel { Filter = filter });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Index(SearchRequestModel model)
+        [HttpGet]
+        public async Task<IActionResult> Index([FromQuery]SearchRequestModel model)
         {
             var tags = model.Tag?.Split(' ');
             var skip = 0;
@@ -35,9 +35,9 @@ namespace BlogBounty.Controllers
                 .TopicsWithRelations()
                 .Where(t =>
                     tags == null || t.Tags.Any(tag => tags.Contains(tag.Tag.Label)))
-                .Where(t => 
-                    string.IsNullOrEmpty(model.Filter) 
-                    || (t.Title.Contains(model.Filter) || t.Description.Contains(model.Filter) || t.Tags.Any(tag => tag.Tag.Label.Contains(model.Filter))))
+                .Where(t =>
+                    string.IsNullOrEmpty(model.Filter)
+                    || (t.Title.Contains(model.Filter) || (t.Description ?? string.Empty).Contains(model.Filter) || t.Tags.Any(tag => tag.Tag.Label.Contains(model.Filter))))
                 .OrderByDescending(t => t.CreatedAt)
                 .Skip(skip)
                 .Take(take)
